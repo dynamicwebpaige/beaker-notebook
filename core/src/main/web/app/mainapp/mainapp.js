@@ -46,6 +46,7 @@
       $route,
       $routeParams,
       $timeout,
+      $sessionStorage,
       bkUtils,
       bkCoreManager,
       bkSession,
@@ -354,6 +355,16 @@
                 loadNotebookModelAndResetSession(
                     notebookUri, uriType, readOnly, format, notebookModel, edited, sessionId, true);
               });
+            },
+            fromImport: function(sessionId) {
+              var notebook = $sessionStorage.importedNotebook;
+              var notebookUri = null;
+              var uriType = null;
+              var readOnly = true;
+              var format = null;
+              var notebookModel = bkNotebookVersionManager.open(notebook);
+              loadNotebookModelAndResetSession(
+                  notebookUri, uriType, readOnly, format, notebookModel, false, sessionId, false);
             },
             emptyNotebook: function(sessionId) {
               var notebookModel =
@@ -1114,6 +1125,9 @@
             } else {
               loadNotebook.emptyNotebook(sessionId);
             }
+          } else if ($route.current.locals.isImport) {
+            delete sessionRouteResolve.isImport;
+            loadNotebook.fromImport(sessionId);
           } else if ($route.current.locals.isOpen) {
             delete sessionRouteResolve.isOpen;
             delete sessionRouteResolve.target;
